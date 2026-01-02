@@ -7,16 +7,29 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		987F07932F075464000CC22C /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 987F07922F075464000CC22C /* GoogleMobileAds */; };
+		98D52A8A2F075E76009BACFA /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 98D52A892F075E76009BACFA /* GoogleMobileAds */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		98CDC0182EFF9B3100DBA0F1 /* SoundboardTemplate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SoundboardTemplate.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		98D52A872F075A04009BACFA /* Exceptions for "SoundboardTemplate" folder in "SoundboardTemplate" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 98CDC0172EFF9B3100DBA0F1 /* SoundboardTemplate */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		98CDC01A2EFF9B3100DBA0F1 /* SoundboardTemplate */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				98D52A872F075A04009BACFA /* Exceptions for "SoundboardTemplate" folder in "SoundboardTemplate" target */,
+			);
 			path = SoundboardTemplate;
 			sourceTree = "<group>";
 		};
@@ -27,7 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				987F07932F075464000CC22C /* GoogleMobileAds in Frameworks */,
+				98D52A8A2F075E76009BACFA /* GoogleMobileAds in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -70,7 +83,7 @@
 			);
 			name = SoundboardTemplate;
 			packageProductDependencies = (
-				987F07922F075464000CC22C /* GoogleMobileAds */,
+				98D52A892F075E76009BACFA /* GoogleMobileAds */,
 			);
 			productName = SoundboardTemplate;
 			productReference = 98CDC0182EFF9B3100DBA0F1 /* SoundboardTemplate.app */;
@@ -101,7 +114,7 @@
 			mainGroup = 98CDC00F2EFF9B3100DBA0F1;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				987F07912F075464000CC22C /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
+				98D52A882F075E76009BACFA /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 98CDC0192EFF9B3100DBA0F1 /* Products */;
@@ -265,12 +278,12 @@
 				DEVELOPMENT_TEAM = XKL3LPVT46;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SoundboardTemplate/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_GADApplicationIdentifier = "ca-app-pub-3940256099942544~1458002511";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -298,12 +311,12 @@
 				DEVELOPMENT_TEAM = XKL3LPVT46;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SoundboardTemplate/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_GADApplicationIdentifier = "ca-app-pub-3940256099942544~1458002511";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -345,7 +358,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		987F07912F075464000CC22C /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
+		98D52A882F075E76009BACFA /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/googleads/swift-package-manager-google-mobile-ads.git";
 			requirement = {
@@ -356,9 +369,9 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		987F07922F075464000CC22C /* GoogleMobileAds */ = {
+		98D52A892F075E76009BACFA /* GoogleMobileAds */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 987F07912F075464000CC22C /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
+			package = 98D52A882F075E76009BACFA /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
 			productName = GoogleMobileAds;
 		};
 /* End XCSwiftPackageProductDependency section */

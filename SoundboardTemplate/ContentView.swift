@@ -10,15 +10,11 @@ import SwiftUI
 struct ContentView: View {
     var body: some View {
         VStack(spacing: 0) {
-            // Main content
-            VStack {
-                Image(systemName: "globe")
-                    .imageScale(.large)
-                    .foregroundStyle(.tint)
-                Text("Hello, world!")
-            }
-            .padding()
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            // Header area with app title and settings button
+            HeaderView()
+            
+            // Scrollable grid of buttons
+            SoundboardGridView()
             
             // AdMob banner ad at the bottom (test mode)
             BannerAdView(adUnitID: "ca-app-pub-3940256099942544/2934735716")

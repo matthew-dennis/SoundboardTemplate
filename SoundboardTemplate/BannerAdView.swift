@@ -2,7 +2,6 @@
 //  BannerAdView.swift
 //  SoundboardTemplate
 //
-
 import SwiftUI
 import GoogleMobileAds
 
@@ -25,4 +24,3 @@ struct BannerAdView: UIViewRepresentable {
     
     func updateUIView(_ uiView: BannerView, context: Context) {}
 }
-
