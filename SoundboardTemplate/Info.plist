@@ -6,6 +6,15 @@
 	<string>ca-app-pub-3940256099942544~1458002511</string>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>We use your data to provide personalized ads and improve your experience. This helps us keep the app free.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>This app needs access to save sound files to your photo library.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs access to save sound files to your photo library.</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>App-Prefs</string>
+		<string>prefs</string>
+	</array>
 	<key>SKAdNetworkItems</key>
 	<array>
 		<dict>
