@@ -18,7 +18,7 @@ struct BannerAdView: UIViewRepresentable {
     /// Creates and configures the UIKit banner view for display in SwiftUI.
     /// - Parameter context: The context provided by SwiftUI for the view representation.
     /// - Returns: A configured GADBannerView ready to display ads.
-    func makeUIView(context: Context) -> BannerView {
+    func makeUIView(context: Context) ->  BannerView {
         // Create a banner view with standard banner size
         let banner = BannerView(adSize: AdSizeBanner)
         

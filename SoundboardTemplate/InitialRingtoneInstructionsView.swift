@@ -26,33 +26,35 @@ struct InitialRingtoneInstructionsView: View {
                     .fontWeight(.bold)
                     .padding(.bottom, 10)
                 
-                // Explanation text about needing to save the file first
-                Text("To set this sound as your ringtone, you'll need to save it to your device first.")
+                // Explanation text about the share sheet process
+                Text("A share sheet will appear. Select \"Use as Ringtone\" to add this sound to your ringtones.")
                     .font(.body)
                     .foregroundColor(.secondary)
                     .padding(.bottom, 10)
                 
                 // List of instruction steps
                 VStack(alignment: .leading, spacing: 16) {
-                    InstructionStep(number: 1, text: "Save the sound file to your device")
+                    InstructionStep(number: 1, text: "Tap the button below to open the share sheet")
                     
-                    InstructionStep(number: 2, text: "Follow the instructions to set it as your ringtone")
+                    InstructionStep(number: 2, text: "Select \"Use as Ringtone\" from the share sheet")
+                    
+                    InstructionStep(number: 3, text: "Follow the instructions to set it as your ringtone")
                 }
                 .padding(.vertical)
                 
                 // Spacer pushes the button to the bottom
                 Spacer()
                 
-                // Save File button that triggers the save process
+                // Continue button that triggers the share sheet
                 Button(action: {
-                    // Dismiss this view and trigger the save action
+                    // Dismiss this view and trigger the share sheet
                     dismiss()
                     onContinue()
                 }) {
                     HStack {
-                        // Download icon
-                        Image(systemName: "square.and.arrow.down")
-                        Text("Save File")
+                        // Share icon
+                        Image(systemName: "square.and.arrow.up")
+                        Text("Open Share Sheet")
                     }
                     .frame(maxWidth: .infinity) // Full width button
                     .padding()
@@ -73,6 +75,37 @@ struct InitialRingtoneInstructionsView: View {
                     }
                 }
             }
+        }
+    }
+}
+
+/// A reusable view component that displays a numbered instruction step.
+/// Shows a circular number badge followed by instruction text.
+struct InstructionStep: View {
+    /// The step number to display in the circular badge.
+    let number: Int
+    
+    /// The instruction text to display next to the number.
+    let text: String
+    
+    var body: some View {
+        // Horizontal stack with top alignment
+        HStack(alignment: .top, spacing: 12) {
+            // Circular number badge
+            Text("\(number)")
+                .font(.headline)
+                .foregroundColor(.white)
+                .frame(width: 28, height: 28)
+                .background(Color.blue)
+                .clipShape(Circle())
+            
+            // Instruction text
+            Text(text)
+                .font(.body)
+                .foregroundColor(.primary)
+            
+            // Spacer pushes content to the left
+            Spacer()
         }
     }
 }

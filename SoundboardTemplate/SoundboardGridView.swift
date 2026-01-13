@@ -50,9 +50,6 @@ struct SoundboardGridView: View {
     /// Optional pending ringtone index that triggers initial instructions when set.
     @State private var pendingRingtoneIndex: PendingRingtoneIndex?
     
-    /// Boolean that controls whether the ringtone instructions view is shown.
-    @State private var showRingtoneInstructions = false
-    
     var body: some View {
         // Scrollable view containing the grid
         ScrollView {
@@ -99,10 +96,6 @@ struct SoundboardGridView: View {
                     saveSoundForRingtone(at: pending.index)
                 }
             })
-        }
-        // Present final ringtone instructions after file is saved
-        .sheet(isPresented: $showRingtoneInstructions) {
-            RingtoneInstructionsView()
         }
         // Load all sounds when the view appears
         .onAppear {
@@ -161,7 +154,8 @@ struct SoundboardGridView: View {
         }
     }
     
-    /// Saves a sound file for ringtone setup and shows instructions after successful save.
+    /// Prepares a sound file for ringtone setup using the share sheet.
+    /// Users can select "Use as Ringtone" from the share sheet to add it to their ringtones.
     /// - Parameter index: The index of the sound button to set as ringtone.
     private func saveSoundForRingtone(at index: Int) {
         // Get the URL of the sound file
@@ -170,28 +164,19 @@ struct SoundboardGridView: View {
             return
         }
         
-        // Get the root view controller to present the document picker
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let rootViewController = windowScene.windows.first?.rootViewController {
-            // Save the sound file using the file manager
-            SoundFileManager.shared.saveSound(at: url, from: rootViewController) { result in
-                DispatchQueue.main.async {
-                    switch result {
-                    case .success:
-                        print("Save successful, showing ringtone instructions")
-                        // After successful save, show ringtone instructions
-                        // Add a small delay to ensure document picker is fully dismissed
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                            self.showRingtoneInstructions = true
-                        }
-                    case .failure(let error):
-                        if case SoundFileError.userCancelled = error {
-                            // User cancelled, don't show instructions
-                            print("Save cancelled")
-                        } else {
-                            print("Error saving sound: \(error.localizedDescription)")
-                        }
-                    }
+        // Reset shareableURL first to ensure clean state
+        shareableURL = nil
+        
+        // Copy file to temporary location for sharing
+        SoundFileManager.shared.shareSound(at: url) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let tempURL):
+                    // Set the shareableURL, which will automatically show the share sheet
+                    // User can then select "Use as Ringtone" from the share sheet
+                    shareableURL = ShareableURL(url: tempURL)
+                case .failure(let error):
+                    print("Error preparing sound for ringtone: \(error.localizedDescription)")
                 }
             }
         }
