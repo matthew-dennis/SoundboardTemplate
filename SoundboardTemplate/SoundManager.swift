@@ -19,6 +19,10 @@ class SoundManager: ObservableObject {
     /// Used to retrieve file URLs for saving and sharing operations.
     private var soundURLs: [Int: URL] = [:]
     
+    /// Serial queue for thread-safe access to dictionaries.
+    /// All dictionary read/write operations are synchronized through this queue.
+    private let accessQueue = DispatchQueue(label: "com.soundboardtemplate.soundmanager", attributes: .concurrent)
+    
     /// Initializes the sound manager and configures the audio session.
     init() {
         configureAudioSession()
@@ -28,8 +32,12 @@ class SoundManager: ObservableObject {
     /// Tries multiple methods to locate the sound file in the app bundle.
     /// - Parameter index: The index of the sound to load (1-based).
     func loadSound(at index: Int) {
-        // Skip if already loaded
-        guard soundURLs[index] == nil else { return }
+        // Check if already loaded (thread-safe read)
+        var alreadyLoaded = false
+        accessQueue.sync {
+            alreadyLoaded = soundURLs[index] != nil
+        }
+        guard !alreadyLoaded else { return }
         
         var soundURL: URL?
         
@@ -60,9 +68,11 @@ class SoundManager: ObservableObject {
                 let player = try AVAudioPlayer(contentsOf: url)
                 // Prepare the player for immediate playback (reduces latency)
                 player.prepareToPlay()
-                // Cache the player and URL for future use
-                audioPlayers[index] = player
-                soundURLs[index] = url
+                // Cache the player and URL for future use (thread-safe write)
+                accessQueue.async(flags: .barrier) {
+                    self.audioPlayers[index] = player
+                    self.soundURLs[index] = url
+                }
                 print("Successfully loaded sound \(index)")
             } catch {
                 print("Error loading sound \(index): \(error.localizedDescription)")
@@ -82,9 +92,17 @@ class SoundManager: ObservableObject {
     
     /// Plays a sound at the specified index.
     /// Stops any currently playing instance and restarts from the beginning.
+    /// If the sound is not loaded, attempts to load it first (lazy loading).
     /// - Parameter index: The index of the sound to play (1-based).
     func playSound(at index: Int) {
-        if let player = audioPlayers[index] {
+        // Thread-safe read to get the player
+        var player: AVAudioPlayer?
+        accessQueue.sync {
+            player = audioPlayers[index]
+        }
+        
+        if let player = player {
+            // Sound is already loaded, play it
             // Stop any currently playing instance
             player.stop()
             // Reset to beginning
@@ -92,7 +110,26 @@ class SoundManager: ObservableObject {
             // Start playback
             player.play()
         } else {
-            print("Sound \(index) not loaded")
+            // Sound not loaded, attempt lazy loading
+            print("Sound \(index) not loaded, attempting to load...")
+            loadSound(at: index)
+            
+            // After loading attempt, check again (with a small delay to allow async write to complete)
+            // Use a barrier sync to ensure the write has completed
+            accessQueue.sync(flags: .barrier) {
+                player = audioPlayers[index]
+            }
+            
+            if let player = player {
+                // Successfully loaded, now play it
+                player.stop()
+                player.currentTime = 0
+                player.play()
+                print("Sound \(index) loaded and played successfully")
+            } else {
+                // Still not available after loading attempt
+                print("⚠️ Sound \(index) could not be loaded or file not found")
+            }
         }
     }
     
@@ -100,7 +137,10 @@ class SoundManager: ObservableObject {
     /// - Parameter index: The index of the sound (1-based).
     /// - Returns: The URL of the sound file, or nil if not loaded.
     func getSoundURL(at index: Int) -> URL? {
-        return soundURLs[index]
+        // Thread-safe read
+        return accessQueue.sync {
+            return soundURLs[index]
+        }
     }
     
     /// Configures the audio session for playback.

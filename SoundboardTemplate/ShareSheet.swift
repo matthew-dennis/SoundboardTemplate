@@ -13,6 +13,10 @@ struct ShareSheet: UIViewControllerRepresentable {
     /// In this app, this typically contains a URL to a sound file.
     let activityItems: [Any]
     
+    /// Optional closure called when the share sheet is dismissed.
+    /// Use this to clean up temporary files.
+    var onDismiss: (() -> Void)?
+    
     /// Creates and configures the UIActivityViewController for sharing.
     /// - Parameter context: The context provided by SwiftUI for the view representation.
     /// - Returns: A configured UIActivityViewController ready to display the share sheet.
@@ -23,6 +27,12 @@ struct ShareSheet: UIViewControllerRepresentable {
             activityItems: activityItems,
             applicationActivities: nil
         )
+        
+        // Set completion handler to clean up when dismissed
+        controller.completionWithItemsHandler = { _, _, _, _ in
+            onDismiss?()
+        }
+        
         return controller
     }
     

@@ -18,6 +18,10 @@ class SoundFileManager {
     /// This prevents delegates from being deallocated before the picker completes.
     private var activeDelegates: [DocumentPickerDelegate] = []
     
+    /// Serial queue for thread-safe access to activeDelegates array.
+    /// All array read/write operations are synchronized through this queue.
+    private let delegatesQueue = DispatchQueue(label: "com.soundboardtemplate.soundfilemanager.delegates")
+    
     /// Private initializer to enforce singleton pattern.
     private init() {}
     
@@ -48,24 +52,47 @@ class SoundFileManager {
                 // asCopy: true means the file will be copied, not moved
                 let documentPicker = UIDocumentPickerViewController(forExporting: [destinationURL], asCopy: true)
                 
-                // Create delegate with completion that removes itself from active list
+                // Create delegate with completion that removes itself from active list and cleans up temp file
                 var delegate: DocumentPickerDelegate!
-                delegate = DocumentPickerDelegate { [weak self] result in
-                    // Remove delegate from active list when done to prevent memory leaks
-                    if let self = self, let index = self.activeDelegates.firstIndex(where: { $0 === delegate }) {
-                        self.activeDelegates.remove(at: index)
+                delegate = DocumentPickerDelegate(tempFileURL: destinationURL) { [weak self] result in
+                    // Clean up temporary file
+                    if let tempURL = delegate.tempFileURL {
+                        try? FileManager.default.removeItem(at: tempURL)
+                    }
+                    
+                    // Remove delegate from active list when done to prevent memory leaks (thread-safe)
+                    if let self = self {
+                        self.delegatesQueue.async {
+                            if let index = self.activeDelegates.firstIndex(where: { $0 === delegate }) {
+                                self.activeDelegates.remove(at: index)
+                            }
+                        }
                     }
                     completion(result)
                 }
                 
-                // Retain the delegate to prevent it from being deallocated
-                self.activeDelegates.append(delegate)
+                // Retain the delegate to prevent it from being deallocated (thread-safe)
+                // Use sync to ensure delegate is added before picker is presented
+                self.delegatesQueue.sync {
+                    self.activeDelegates.append(delegate)
+                }
                 documentPicker.delegate = delegate
                 
                 // Present the document picker from the root view controller
                 if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                    let rootViewController = windowScene.windows.first?.rootViewController {
                     rootViewController.present(documentPicker, animated: true)
+                } else {
+                    // If root view controller is unavailable, clean up temp file, delegate, and report error
+                    if let tempURL = delegate.tempFileURL {
+                        try? FileManager.default.removeItem(at: tempURL)
+                    }
+                    self.delegatesQueue.async {
+                        if let index = self.activeDelegates.firstIndex(where: { $0 === delegate }) {
+                            self.activeDelegates.remove(at: index)
+                        }
+                    }
+                    completion(.failure(SoundFileError.unknown))
                 }
             }
         } catch {
@@ -78,6 +105,7 @@ class SoundFileManager {
     
     /// Prepares a sound file for sharing by copying it to a temporary location.
     /// The temporary URL can then be used with the share sheet.
+    /// Note: The caller is responsible for cleaning up the temporary file after sharing is complete.
     /// - Parameters:
     ///   - url: The URL of the sound file to share.
     ///   - completion: Closure called with the result containing the temporary URL or an error.
@@ -107,6 +135,13 @@ class SoundFileManager {
             }
         }
     }
+    
+    /// Cleans up a temporary file at the specified URL.
+    /// Safe to call even if the file doesn't exist.
+    /// - Parameter url: The URL of the temporary file to delete.
+    func cleanupTempFile(at url: URL) {
+        try? FileManager.default.removeItem(at: url)
+    }
 }
 
 /// Helper class to handle document picker delegate callbacks.
@@ -115,9 +150,15 @@ class DocumentPickerDelegate: NSObject, UIDocumentPickerDelegate {
     /// Completion closure called when the document picker finishes or is cancelled.
     let completion: (Result<Void, Error>) -> Void
     
-    /// Initializes the delegate with a completion handler.
-    /// - Parameter completion: Closure called with the result of the document picker operation.
-    init(completion: @escaping (Result<Void, Error>) -> Void) {
+    /// Temporary file URL that should be cleaned up after the picker completes.
+    let tempFileURL: URL?
+    
+    /// Initializes the delegate with a completion handler and optional temp file URL.
+    /// - Parameters:
+    ///   - tempFileURL: Optional temporary file URL to clean up after completion.
+    ///   - completion: Closure called with the result of the document picker operation.
+    init(tempFileURL: URL? = nil, completion: @escaping (Result<Void, Error>) -> Void) {
+        self.tempFileURL = tempFileURL
         self.completion = completion
     }
     

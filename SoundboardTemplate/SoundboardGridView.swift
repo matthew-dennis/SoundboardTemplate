@@ -86,7 +86,10 @@ struct SoundboardGridView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         // Present share sheet when shareableURL is set
         .sheet(item: $shareableURL) { shareable in
-            ShareSheet(activityItems: [shareable.url])
+            ShareSheet(activityItems: [shareable.url]) {
+                // Clean up temporary file when share sheet is dismissed
+                SoundFileManager.shared.cleanupTempFile(at: shareable.url)
+            }
         }
         // Present initial ringtone instructions when pendingRingtoneIndex is set
         .sheet(item: $pendingRingtoneIndex) { pending in
@@ -152,6 +155,7 @@ struct SoundboardGridView: View {
                     shareableURL = ShareableURL(url: tempURL)
                 case .failure(let error):
                     print("Error preparing sound for sharing: \(error.localizedDescription)")
+                    // Note: No temp file was created in error case, so no cleanup needed
                 }
             }
         }
