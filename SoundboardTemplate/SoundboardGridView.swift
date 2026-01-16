@@ -29,16 +29,17 @@ struct PendingRingtoneIndex: Identifiable {
     let index: Int
 }
 
-/// The main grid view that displays all sound buttons in a scrollable 2-column layout.
+/// The main grid view that displays all sound buttons in a scrollable 3-column layout.
 /// Handles sound playback, saving, sharing, and ringtone setup functionality.
 struct SoundboardGridView: View {
     /// Total number of sound buttons to display in the grid.
     let numberOfButtons = 32
     
-    /// Grid layout configuration: 2 flexible columns with 10pt spacing.
+    /// Grid layout configuration: 3 flexible columns with no spacing.
     let columns = [
-        GridItem(.flexible(), spacing: 10),
-        GridItem(.flexible(), spacing: 10)
+        GridItem(.flexible(), spacing: 0),
+        GridItem(.flexible(), spacing: 0),
+        GridItem(.flexible(), spacing: 0)
     ]
     
     /// Sound manager that handles loading and playing sounds.
@@ -54,7 +55,7 @@ struct SoundboardGridView: View {
         // Scrollable view containing the grid
         ScrollView {
             // Lazy vertical grid that only renders visible items for performance
-            LazyVGrid(columns: columns, spacing: 10) {
+            LazyVGrid(columns: columns, spacing: 0) {
                 // Create a button for each sound (1 through numberOfButtons)
                 ForEach(1...numberOfButtons, id: \.self) { index in
                     SoundButton(
@@ -78,7 +79,6 @@ struct SoundboardGridView: View {
                     )
                 }
             }
-            .padding()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         // Present share sheet when shareableURL is set

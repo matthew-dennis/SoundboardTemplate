@@ -16,22 +16,36 @@ struct SettingsView: View {
     
     var body: some View {
         NavigationView {
-            // Vertical stack for settings content
-            VStack {
-                // Settings title
-                Text("Settings")
-                    .font(.title)
-                    .padding()
+            // List of settings options
+            List {
+                // Legal & Privacy Section
+                Section("Legal & Privacy") {
+                    Link(destination: URL(string: "https://example.com/privacy-policy")!) {
+                        Label("Privacy Policy", systemImage: "hand.raised.fill")
+                    }
+                }
                 
-                // Add your settings content here
-                // This is a placeholder for future settings options such as:
-                // - Volume controls
-                // - Sound preferences
-                // - App appearance
-                // - About section
+                // Developer Section
+                Section("Developer") {
+                    Link(destination: URL(string: "https://example.com/developer")!) {
+                        Label("Developer Website", systemImage: "globe")
+                    }
+                    
+                    Link(destination: URL(string: "mailto:support@example.com")!) {
+                        Label("Contact Support", systemImage: "envelope.fill")
+                    }
+                }
                 
-                // Spacer fills remaining space
-                Spacer()
+                // App Section
+                Section("App") {
+                    Link(destination: URL(string: "https://apps.apple.com/app/id1234567890")!) {
+                        Label("Rate This App", systemImage: "star.fill")
+                    }
+                    
+                    Link(destination: URL(string: "https://apps.apple.com/developer/example")!) {
+                        Label("Other Apps by Developer", systemImage: "square.grid.2x2.fill")
+                    }
+                }
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)

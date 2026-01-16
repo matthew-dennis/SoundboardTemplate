@@ -24,17 +24,31 @@ struct SoundButton: View {
     /// Callback closure executed when "Set as ringtone" is selected from the context menu.
     let onSetAsRingtone: () -> Void
     
+    @Environment(\.colorScheme) var colorScheme
+    
+    private var borderColor: Color {
+        colorScheme == .dark ? Color.black : Color(white: 0.8)
+    }
+    
     var body: some View {
         // Main button that plays the sound when tapped
         Button(action: onPlay) {
             // Button label showing the sound number
-            Text("Sound \(index)")
-                .font(.headline)
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity) // Full width button
-                .frame(height: 80) // Fixed height for consistent grid layout
-                .background(Color.blue)
-                .cornerRadius(10)
+            ZStack(alignment: .bottom) {
+                Color.blue
+                    .aspectRatio(1, contentMode: .fit)
+                
+                Text("Sound \(index)")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .padding(.bottom, 8)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .aspectRatio(1, contentMode: .fit)
+            .overlay(
+                Rectangle()
+                    .stroke(borderColor, lineWidth: 1)
+            )
         }
         // Context menu (long press) with additional options
         .contextMenu {
