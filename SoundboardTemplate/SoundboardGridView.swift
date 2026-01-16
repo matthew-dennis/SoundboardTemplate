@@ -43,7 +43,7 @@ struct SoundboardGridView: View {
     ]
     
     /// Sound manager that handles loading and playing sounds.
-    @StateObject private var soundManager = SoundManager()
+    @ObservedObject private var soundManager = SoundManager.shared
     
     /// Optional shareable URL that triggers the share sheet when set.
     @State private var shareableURL: ShareableURL?

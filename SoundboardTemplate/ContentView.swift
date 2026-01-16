@@ -24,6 +24,9 @@ struct ContentView: View {
             // Note: This is a test ad unit ID. Replace with your production ad unit ID.
             BannerAdView(adUnitID: "ca-app-pub-3940256099942544/2934735716")
                 .frame(height: 50) // Standard banner ad height
+            
+            // Audio control bar with playback information and loop toggle
+            AudioControlBar()
         }
     }
 }
