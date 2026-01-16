@@ -12,6 +12,9 @@ import GoogleMobileAds
 /// The main app struct that serves as the entry point for the application.
 @main
 struct SoundboardTemplateApp: App {
+    /// Controls whether the splash screen is currently displayed.
+    @State private var showSplash = true
+    
     /// Initializes the app and sets up required services.
     init() {
         // Initialize Google Mobile Ads SDK
@@ -29,8 +32,27 @@ struct SoundboardTemplateApp: App {
     /// Defines the app's scene structure.
     var body: some Scene {
         WindowGroup {
-            // The main content view of the app
-            ContentView()
+            ZStack {
+                if showSplash {
+                    // Show splash screen during initialization
+                    SplashScreenView(isActive: $showSplash)
+                        .transition(.opacity)
+                } else {
+                    // Show main content after splash screen
+                    ContentView()
+                        .transition(.opacity)
+                }
+            }
+            .onAppear {
+                // Dismiss splash screen after initialization period
+                // This gives time for ads SDK and other services to initialize
+                // Adjust the delay as needed (currently 2 seconds)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                    withAnimation(.easeInOut(duration: 0.5)) {
+                        showSplash = false
+                    }
+                }
+            }
         }
     }
 }
