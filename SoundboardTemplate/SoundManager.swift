@@ -42,6 +42,12 @@ class SoundManager: ObservableObject {
     /// Whether playback is currently paused.
     @Published var isPaused: Bool = false
     
+    /// Progress of the currently playing audio (0.0 to 1.0).
+    @Published var progress: Double = 0.0
+    
+    /// Timer for updating progress during playback.
+    private var progressTimer: Timer?
+    
     /// Serial queue for thread-safe access to dictionaries.
     /// All dictionary read/write operations are synchronized through this queue.
     private let accessQueue = DispatchQueue(label: "com.soundboardtemplate.soundmanager", attributes: .concurrent)
@@ -152,6 +158,7 @@ class SoundManager: ObservableObject {
             DispatchQueue.main.async {
                 self.mostRecentSoundIndex = index
                 self.isPaused = false
+                self.startProgressTimer()
             }
         } else {
             // Sound not loaded, attempt lazy loading
@@ -181,6 +188,7 @@ class SoundManager: ObservableObject {
                 DispatchQueue.main.async {
                     self.mostRecentSoundIndex = index
                     self.isPaused = false
+                    self.startProgressTimer()
                 }
                 print("Sound \(index) loaded and played successfully")
             } else {
@@ -249,6 +257,7 @@ class SoundManager: ObservableObject {
             DispatchQueue.main.async {
                 self.isLooping = true
                 self.loopingSoundIndex = index
+                self.startProgressTimer()
             }
             print("✅ Started looping sound \(index)")
         } else {
@@ -324,6 +333,11 @@ class SoundManager: ObservableObject {
         let newPauseState = shouldPause
         DispatchQueue.main.async {
             self.isPaused = newPauseState
+            if newPauseState {
+                self.stopProgressTimer()
+            } else {
+                self.startProgressTimer()
+            }
         }
         
         print(newPauseState ? "⏸️ Paused all sounds" : "▶️ Resumed all sounds")
@@ -345,9 +359,11 @@ class SoundManager: ObservableObject {
             }
         }
         
-        // Reset pause state
+        // Reset pause state and progress
         DispatchQueue.main.async {
             self.isPaused = false
+            self.progress = 0.0
+            self.stopProgressTimer()
         }
         
         print("⏹️ Stopped all sounds")
@@ -360,6 +376,44 @@ class SoundManager: ObservableObject {
                 player.volume = self.volume
             }
         }
+    }
+    
+    /// Starts the progress timer to update playback progress.
+    private func startProgressTimer() {
+        stopProgressTimer() // Stop any existing timer
+        
+        guard let index = mostRecentSoundIndex else { return }
+        
+        progressTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
+            guard let self = self else { return }
+            
+            var player: AVAudioPlayer?
+            self.accessQueue.sync {
+                player = self.audioPlayers[index]
+            }
+            
+            if let player = player, player.duration > 0 {
+                let currentProgress = player.currentTime / player.duration
+                DispatchQueue.main.async {
+                    // If looping, reset progress when it reaches 1.0
+                    if self.isLooping && currentProgress >= 1.0 {
+                        self.progress = 0.0
+                    } else {
+                        self.progress = min(max(currentProgress, 0.0), 1.0)
+                    }
+                }
+            } else {
+                DispatchQueue.main.async {
+                    self.progress = 0.0
+                }
+            }
+        }
+    }
+    
+    /// Stops the progress timer.
+    private func stopProgressTimer() {
+        progressTimer?.invalidate()
+        progressTimer = nil
     }
     
     /// Configures the audio session for playback.
